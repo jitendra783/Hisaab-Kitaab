@@ -1,0 +1,29 @@
+version: 1.0
+server:
+  host: 0.0.0.0
+  port: 8082
+
+log:
+  level: -1
+
+db:
+  postgres:
+    host: mutualfund-instance-1.c68igmzfnacf.ap-south-1.rds.amazonaws.com
+    port: 5432
+    user: postgres
+    password: 95de8!oYsoMF
+    db: mutualfundtest
+    sslmode: disable
+  oracle:
+    username: wealthside_isec
+    password: wealthside_isec
+    server: dpsecure.cinfr8oh0csk.ap-south-1.rds.amazonaws.com
+    port: 1522
+    service: DPSECURE
+    schema: WEALTHSIDE_SIX
+  mysql:
+    username: root
+    password: Jitu@2783
+    server: localhost
+    port: 3306
+    db: hisaab-kitaab

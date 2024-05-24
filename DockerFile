@@ -1,0 +1,9 @@
+FROM golang:1.20-alpine as base
+WORKDIR /opt/Hisaab-Kitaab
+COPY src ./src
+WORKDIR /opt/Hisaab-Kitaab
+RUN go build -o ./Hisaab-Kitaab
+
+#RUN cd src/isec/mutualfund && go run .
+EXPOSE 8040
+CMD ./Hisaab-Kitaab
