@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"bytes"
+	"hisaab-kitaab/pkg/config"
 	"hisaab-kitaab/pkg/logger"
+	"hisaab-kitaab/pkg/utils"
 	"log"
 	"net/http"
 	"strings"
@@ -10,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
+	kjwt "github.com/kataras/jwt"
 	"go.uber.org/zap"
 )
 
@@ -26,9 +29,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			xlength     string
-			scope       string
 			userId      string
-			ucc         string
 			accessToken string
 		)
 		alg := kjwt.EdDSA
@@ -120,7 +121,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set(config.XLENGTH, xlength)
 
 		log.Println("claims", claims)
-		log.Println("userid, ucc= ", userId, ucc, xlength, scope)
+		log.Println("userid, ucc= ", userId, xlength)
 
 		requestID := uuid.New().String()
 		c.Set(config.REQUESTID, requestID)
