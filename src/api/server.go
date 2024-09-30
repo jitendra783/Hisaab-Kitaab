@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"hisaab-kitaab/pkg/config"
 	"hisaab-kitaab/pkg/db"
@@ -31,15 +32,15 @@ func Start() error {
 	}
 	logger.LoggerInit(config.GetString("log.path"), zapcore.Level(logLevel))
 	e.ErrorInit()
-	// var mysqlConnectionSql *sql.DB = nil
-	// var mysqlConn *gorm.DB = nil
-	mysqlConn, mysqlConnectionSql, err := db.MysqlConnect()
-	if err != nil {
-		logger.Log().Error("Failed to connect mysql database", zap.Error(err))
-		return err
-	}
+	var mysqlConnectionSql *sql.DB = nil
+	var mysqlConn *gorm.DB = nil
+	// mysqlConn, mysqlConnectionSql, err := db.MysqlConnect()
+	// if err != nil {
+	// 	logger.Log().Error("Failed to connect mysql database", zap.Error(err))
+	// 	return err
+	// }
 	databases = make([]*gorm.DB, 0)
-	databases = append(databases, mysqlConn)
+	//databases = append(databases, mysqlConn)
 
 	dbObj := db.NewDbObj(mysqlConn, mysqlConnectionSql)
 

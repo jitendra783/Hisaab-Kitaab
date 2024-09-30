@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"hisaab-kitaab/pkg/config"
 	"hisaab-kitaab/pkg/logger"
-	"hisaab-kitaab/pkg/utils"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -17,9 +17,7 @@ import (
 )
 
 var (
-	sep    = []byte(".")
-	pad    = []byte("=")
-	padStr = string(pad)
+	sep = []byte(".")
 )
 
 func joinParts(parts ...[]byte) []byte {
@@ -28,8 +26,8 @@ func joinParts(parts ...[]byte) []byte {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			xlength     string
-			userId      string
+			// xlength     string
+			// userId      string
 			accessToken string
 		)
 		alg := kjwt.EdDSA
@@ -46,13 +44,14 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		accessToken = strings.Split(accessTokenString, " ")[1]
-		decryptedToken, err := decryptAccessToken(accessToken)
-		if err != nil {
-			logger.Log(c).Error("invalid value for encrypted access token", zap.Error(err))
-			//Not returning after receiving error, because it might be the case token was not encrypted in that case, we need to use that as it is. Return statement will be added in latter stages when it has been fully integrated with FE
-		} else {
-			accessToken = decryptedToken
-		}
+		/* not decrpyting the jwt token */
+		// decryptedToken, err := decryptAccessToken(accessToken)
+		// if err != nil {
+		// 	logger.Log(c).Error("invalid value for encrypted access token", zap.Error(err))
+		// 	//Not returning after receiving error, because it might be the case token was not encrypted in that case, we need to use that as it is. Return statement will be added in latter stages when it has been fully integrated with FE
+		// } else {
+		// 	accessToken = decryptedToken
+		// }
 		logger.Log(c).Debug("access token", zap.Any("Access Token", accessToken))
 		c.Set(config.AccessToken, accessToken)
 
@@ -114,14 +113,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set(config.TOKEN, tkn)
-		userId = claims["user_id"].(string)
-		c.Set(config.USERID, userId)
+		// userId = claims["user_id"].(string)
+		// c.Set(config.USERID, userId)
 
-		xlength = claims["X-Length"].(string)
-		c.Set(config.XLENGTH, xlength)
+		// xlength = claims["X-Length"].(string)
+		// c.Set(config.XLENGTH, xlength)
 
 		log.Println("claims", claims)
-		log.Println("userid, ucc= ", userId, xlength)
 
 		requestID := uuid.New().String()
 		c.Set(config.REQUESTID, requestID)
@@ -131,18 +129,46 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func decryptAccessToken(encryptedToken string) (string, error) {
-	var (
-		token string
-	)
+// func decryptAccessToken(encryptedToken string) (string, error) {
+// 	var (
+// 		token string
+// 	)
 
-	encryptionKey := config.GetConfig().GetString("aes.secretkey256")
-	cipher := utils.NewAesCipherService(encryptionKey, true)
+// 	encryptionKey := config.GetConfig().GetString("aes.secretkey256")
+// 	cipher := utils.NewAesCipherService(encryptionKey, true)
 
-	token, err := cipher.AuthTokenDecryption(encryptedToken)
-	if err != nil {
-		return token, err
+// 	token, err := cipher.AuthTokenDecryption(encryptedToken)
+// 	if err != nil {
+// 		return token, err
+// 	}
+
+// 	return token, nil
+// }
+
+func CustomLogger(logger *zap.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+		query := c.Request.URL.RawQuery
+		c.Next()
+
+		if c.FullPath() != "/health" {
+			latency := time.Since(start).Milliseconds()
+			userID := c.GetString(config.USERID)
+			uID := c.GetString(config.REQUESTID)
+			// ucc := c.GetString(config.UCC)
+			logger.Info(path,
+				zap.String("requestID", uID),
+				zap.String("leadId", "ucc"),
+				zap.String("userId", userID),
+				zap.Int("status", c.Writer.Status()),
+				zap.String("method", c.Request.Method),
+				zap.String("path", path),
+				zap.String("query", query),
+				zap.String("user-agent", c.Request.UserAgent()),
+				zap.String("errors", c.Errors.ByType(gin.ErrorTypePrivate).String()),
+				zap.Int64("latency", latency),
+			)
+		}
 	}
-
-	return token, nil
 }

@@ -16,8 +16,8 @@ func UserService(db db.DBLayer) UserGroup {
 
 type UserGroup interface {
 	UserRegister(c *gin.Context)
-	// GetUserByID(c *gin.Context)
+	GetUserByID(c *gin.Context)
 	// UserDetail(c *gin.Context)
 	// UserDeleteByID(c *gin.Context)
-	// UserUpdate(c *gin.Context)
+	UserUpdate(c *gin.Context)
 }

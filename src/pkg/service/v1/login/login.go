@@ -27,8 +27,8 @@ func (l *loginObj) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-    logger.Log(c).Debug("user data", zap.Any("data", resp))
-	// response.Data = append(response.Data, resp)
+	logger.Log(c).Debug("user data", zap.Any("data", resp))
+	response.Data = append(response.Data, resp)
 	response.Status = true
 	response.Message = "user logged in succefully"
 	c.JSON(http.StatusOK, response)

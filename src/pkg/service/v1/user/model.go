@@ -2,14 +2,13 @@ package user
 
 import (
 	e "hisaab-kitaab/pkg/errors"
-	dbuser "hisaab-kitaab/pkg/db/user"
 )
 
 type User struct {
 	User_ID string `json:"user_id"`
 }
 type ApiResponse struct {
-	Data    []dbuser.User
+	Data    string     `json:"token"`
 	Status  bool      `json:"status"`
 	Errors  []e.Error `json:"error"`
 	Message string    `json:"message"`
