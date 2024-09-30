@@ -54,7 +54,7 @@ func MysqlConnect() (*gorm.DB, *sql.DB, error) {
 		elog.Log().Error("failed to connect postgreSQL connection", zap.Error(err), zap.String("connStr", dsn1))
 		return nil, nil, e.ErrorInfo["postreSQLDBConnError"]
 	}
-	elog.Log().Info("Mysql Database Connected")
+	elog.Log().Info("postgre Database Connected")
 	return db, nil, nil
 }
 

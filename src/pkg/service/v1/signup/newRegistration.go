@@ -4,10 +4,10 @@ import (
 	signup "hisaab-kitaab/pkg/db/signUp"
 	e "hisaab-kitaab/pkg/errors"
 	"hisaab-kitaab/pkg/logger"
+	"hisaab-kitaab/pkg/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func (r *signUpObj) NewRegister(c *gin.Context) {
@@ -20,15 +20,15 @@ func (r *signUpObj) NewRegister(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	resp, err := r.db.Register(c, userinfo)
-	if err != nil {
-		logger.Log().Error("error ", zap.Error(err))
-		response.Errors = append(response.Errors, e.ErrorInfo[e.AddDBError].GetErrorDetails(""))
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	response.Data = append(response.Data, resp)
+	// resp, err := r.db.Register(c, userinfo)
+	// if err != nil {
+	// 	logger.Log().Error("error ", zap.Error(err))
+	// 	response.Errors = append(response.Errors, e.ErrorInfo[e.AddDBError].GetErrorDetails(""))
+	// 	c.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
+	token, _ := middleware.CreateToken(userinfo.Name)
+	response.Data = token
 	response.Status = true
 	response.Message = "user Created succefully"
 	c.JSON(http.StatusOK, response)

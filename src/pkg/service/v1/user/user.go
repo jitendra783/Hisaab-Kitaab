@@ -1,9 +1,11 @@
 package user
 
 import (
+	"fmt"
 	dbuser "hisaab-kitaab/pkg/db/user"
 	e "hisaab-kitaab/pkg/errors"
 	"hisaab-kitaab/pkg/logger"
+	"hisaab-kitaab/pkg/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,43 +30,44 @@ func (u *userObj) UserRegister(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-
-	response.Data = append(response.Data, resp)
+	fmt.Println(resp)
+	token, err := middleware.CreateToken(userinfo.Name)
+	response.Data = token
 	response.Status = true
 	response.Message = "user Created succefully"
 	c.JSON(http.StatusOK, response)
 }
 
-// func (u *userObj) GetUserByID(c *gin.Context) {
-// 	logger.Log().Debug("start")
-// 	defer logger.Log().Debug("end")
-// 	var response ApiResponse
-// 	var user GetUserParam
-// 	if err := c.BindUri(&user); err != nil {
-// 		response.Errors = append(response.Errors, e.ErrorInfo[e.BadRequest].GetErrorDetails(""))
-// 		c.JSON(http.StatusBadRequest,response)
-// 		return
-// 	}
-// 	resp, err := u.db.GetUserByID(c, user.Id)
-// 	if err != nil {
-// 		if err.Error() == e.NoDataFound {
-// 			logger.Log().Error("no data found ", zap.Error(err))
-// 			response.Errors = append(response.Errors, e.ErrorInfo[e.NoDataFound].GetErrorDetails(""))
-// 			c.JSON(http.StatusOK,response)
-// 			return
-// 		} else {
-// 			logger.Log().Error("user not available", zap.Error(err))
-// 			response.Errors = append(response.Errors, e.ErrorInfo[e.GetDBError].GetErrorDetails(""))
-// 			c.JSON(http.StatusBadRequest, response)
-// 			return
-// 		}
-// 	}
-// 	response.Data = append(response.Data, resp)
-// 	response.Message = "user Founded"
-// 	response.Status = true
-// 	c.JSON(http.StatusOK, response)
+func (u *userObj) GetUserByID(c *gin.Context) {
+	logger.Log().Debug("start")
+	defer logger.Log().Debug("end")
+	var response ApiResponse
+	var user GetUserParam
+	if err := c.BindUri(&user); err != nil {
+		response.Errors = append(response.Errors, e.ErrorInfo[e.BadRequest].GetErrorDetails(""))
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	resp, err := u.db.GetUserByID(c, user.Id)
+	if err != nil {
+		if err.Error() == e.NoDataFound {
+			logger.Log().Error("no data found ", zap.Error(err))
+			response.Errors = append(response.Errors, e.ErrorInfo[e.NoDataFound].GetErrorDetails(""))
+			c.JSON(http.StatusOK, response)
+			return
+		} else {
+			logger.Log().Error("user not available", zap.Error(err))
+			response.Errors = append(response.Errors, e.ErrorInfo[e.GetDBError].GetErrorDetails(""))
+			c.JSON(http.StatusBadRequest, response)
+			return
+		}
+	}
+	response.Data = resp.Id
+	response.Message = "user Founded"
+	response.Status = true
+	c.JSON(http.StatusOK, response)
+}
 
-// }
 // func (u *userObj) UserDetail(c *gin.Context) {
 // 	logger.Log().Debug("start")
 // 	defer logger.Log().Debug("end")
@@ -101,8 +104,17 @@ func (u *userObj) UserRegister(c *gin.Context) {
 // 	}
 
 // }
-// func (u *userObj) UserUpdate(c *gin.Context) {
-// 	logger.Log().Debug("start")
-// 	defer logger.Log().Debug("end")
+func (u *userObj) UserUpdate(c *gin.Context) {
+	logger.Log().Debug("start")
+	defer logger.Log().Debug("end")
+	var response ApiResponse
+	resp, err := u.db.UpdateUserByID(c)
+	if err != nil {
+		logger.Log().Error("")
+	}
 
-// }
+	response.Data = resp.Id
+	response.Message = "user Updated"
+	response.Status = true
+	c.JSON(http.StatusOK, response)
+}
