@@ -18,7 +18,6 @@ type ApiResponse struct {
 	Errors  []e.Error `json:"error"`
 	Message string    `json:"message"`
 }
-
 type GetUserParam struct {
 	Id string `uri:"id" binding:"required"`
 }
