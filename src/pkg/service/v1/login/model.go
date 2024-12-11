@@ -21,3 +21,5 @@ type ApiResponse struct {
 type GetUserParam struct {
 	Id string `uri:"id" binding:"required"`
 }
+
+
