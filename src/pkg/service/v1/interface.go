@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
+//object
 type srvObj struct {
 	user.UserGroup
 	login.LoginGroup
@@ -22,7 +22,7 @@ func NewServiceGroup(db db.DBLayer) ServiceLayer {
 		signup.SignUpService(db),
 	}
 }
-
+//interface
 type ServiceLayer interface {
 	user.UserGroup
 	login.LoginGroup
